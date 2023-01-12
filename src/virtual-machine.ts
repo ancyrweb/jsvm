@@ -1,6 +1,7 @@
 import { VMVariable } from "./vm-variable";
 import { Instruction } from "./instruction";
 import { Scope } from "./scope";
+import { VMFunction } from "./vm-function";
 
 type VMState =
   | {
@@ -21,15 +22,18 @@ export class VirtualMachine {
   private _scope = new Scope();
   private _stack: any[] = [];
   private _compareResult: boolean | null = null;
+  private _arguments = new Scope();
   private _returnValue: any;
 
   constructor(
     private _chunks: Instruction[],
     config?: {
       scope?: Scope;
+      arguments?: Scope;
     }
   ) {
     this._initialScope = config?.scope ?? this._scope;
+    this._arguments = config?.arguments ?? this._arguments;
   }
 
   run() {
@@ -172,6 +176,35 @@ export class VirtualMachine {
       case "OP_RET": {
         this._returnValue = this.pop();
         break;
+      }
+      case "OP_LOAD_ARG": {
+        if (this._arguments.has(chunk.value()) === false) {
+          throw new Error("Could not find argument " + chunk.value());
+        }
+
+        this.push(this._arguments.get(chunk.value()));
+        break;
+      }
+      case "OP_STORE_ARG": {
+        const value = this.pop();
+        this._arguments.set(chunk.value(), value);
+        break;
+      }
+      case "OP_CALL_FUNCTION": {
+        const fn = this._scope.get(chunk.value()) as VMFunction;
+        if (fn instanceof VMFunction === false) {
+          throw new Error("Could not find function " + chunk.value());
+        }
+
+        const instance = fn.instance({
+          scope: this._scope.copy(),
+          arguments: this._arguments,
+        });
+
+        const result = instance.run();
+        this._arguments.clear();
+
+        this.push(result.returnValue);
       }
     }
 

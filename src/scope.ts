@@ -18,6 +18,14 @@ export class Scope {
     return this._map.get(key);
   }
 
+  has(key: string) {
+    return this._map.has(key);
+  }
+
+  clear() {
+    this._map.clear();
+  }
+
   dump() {
     let out: Record<string, any> = {};
 

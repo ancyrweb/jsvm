@@ -20,6 +20,10 @@ type ChunkType =
   // JUMPS
   | "OP_JUMP_IF_FALSE"
   | "OP_JUMP"
+  // FUNCTIONS
+  | "OP_LOAD_ARG"
+  | "OP_STORE_ARG"
+  | "OP_CALL_FUNCTION"
   // EOF
   | "OP_RET"
   | "OP_EOF";
@@ -83,6 +87,17 @@ export class Instruction<T = any> {
   }
   static jump(steps: number) {
     return new Instruction("OP_JUMP", steps);
+  }
+
+  // Functions
+  static loadArg(name: string) {
+    return new Instruction("OP_LOAD_ARG", name);
+  }
+  static storeArg(name: string) {
+    return new Instruction("OP_STORE_ARG", name);
+  }
+  static callFunction(name: string) {
+    return new Instruction("OP_CALL_FUNCTION", name);
   }
 
   // EOF

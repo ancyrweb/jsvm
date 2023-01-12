@@ -397,39 +397,33 @@ describe("comparisons", () => {
 
 describe("functions", () => {
   it("should run the function", () => {
-    const fn = new VMFunction([
-      Instruction.load("a"),
+    const multiply = new VMFunction([
+      Instruction.loadArg("x"),
       Instruction.constant(10),
       Instruction.multiply(),
       Instruction.ret(),
       Instruction.eof(),
     ]);
 
-    const instance = fn.instance({
-      scope: new Scope({
-        a: new VMVariable(10),
-      }),
+    const vm = new VirtualMachine(
+      [
+        Instruction.constant(10),
+        Instruction.storeArg("x"),
+        Instruction.callFunction("multiply"),
+        Instruction.assign("x"),
+        Instruction.eof(),
+      ],
+      {
+        scope: new Scope({
+          multiply,
+        }),
+      }
+    );
+
+    const result = vm.run();
+    expect(result.memoryDump).toMatchObject({
+      x: 100,
     });
-
-    const result = instance.run();
-    expect(result.returnValue).toEqual(100);
   });
 
-  it("should run the function", () => {
-    const fn = new VMFunction([
-      Instruction.load("a"),
-      Instruction.constant(10),
-      Instruction.multiply(),
-      Instruction.ret(),
-      Instruction.eof(),
-    ]);
-
-    const vm = new VirtualMachine([
-      Instruction.constant(100), // 0
-      Instruction.assign("x"),
-    ]);
-
-    expect(true).toBe(true);
-    // expect(result.returnValue).toEqual(100);
-  });
 });
