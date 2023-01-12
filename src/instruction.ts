@@ -24,73 +24,73 @@ type ChunkType =
   | "OP_RET"
   | "OP_EOF";
 
-export class Chunk<T = any> {
+export class Instruction<T = any> {
   // Static factories
 
   // VALUES
   static assign(name: string) {
-    return new Chunk("OP_ASSIGN", name);
+    return new Instruction("OP_ASSIGN", name);
   }
   static constant(value: number | string) {
-    return new Chunk("OP_CONSTANT", value);
+    return new Instruction("OP_CONSTANT", value);
   }
   static load(name: string) {
-    return new Chunk("OP_LOAD", name);
+    return new Instruction("OP_LOAD", name);
   }
 
   // MATH
   static negate() {
-    return new Chunk("OP_NEGATE");
+    return new Instruction("OP_NEGATE");
   }
 
   // BINOP
   static add() {
-    return new Chunk("OP_ADD");
+    return new Instruction("OP_ADD");
   }
   static subtract() {
-    return new Chunk("OP_SUBTRACT");
+    return new Instruction("OP_SUBTRACT");
   }
   static multiply() {
-    return new Chunk("OP_MULTIPLY");
+    return new Instruction("OP_MULTIPLY");
   }
   static divide() {
-    return new Chunk("OP_DIVIDE");
+    return new Instruction("OP_DIVIDE");
   }
 
   // COMPARES
   static compareEqual() {
-    return new Chunk("OP_COMPARE_EQUAL");
+    return new Instruction("OP_COMPARE_EQUAL");
   }
   static compareNotEqual() {
-    return new Chunk("OP_COMPARE_NOT_EQUAL");
+    return new Instruction("OP_COMPARE_NOT_EQUAL");
   }
   static compareGreater() {
-    return new Chunk("OP_COMPARE_GREATER");
+    return new Instruction("OP_COMPARE_GREATER");
   }
   static compareGreaterEqual() {
-    return new Chunk("OP_COMPARE_GREATER_EQUAL");
+    return new Instruction("OP_COMPARE_GREATER_EQUAL");
   }
   static compareLower() {
-    return new Chunk("OP_COMPARE_LOWER");
+    return new Instruction("OP_COMPARE_LOWER");
   }
   static compareLowerEqual() {
-    return new Chunk("OP_COMPARE_LOWER_EQUAL");
+    return new Instruction("OP_COMPARE_LOWER_EQUAL");
   }
 
   // JUMPS
   static jumpIfFalse(steps: number) {
-    return new Chunk("OP_JUMP_IF_FALSE", steps);
+    return new Instruction("OP_JUMP_IF_FALSE", steps);
   }
   static jump(steps: number) {
-    return new Chunk("OP_JUMP", steps);
+    return new Instruction("OP_JUMP", steps);
   }
 
   // EOF
   static ret() {
-    return new Chunk("OP_RET");
+    return new Instruction("OP_RET");
   }
   static eof() {
-    return new Chunk("OP_EOF");
+    return new Instruction("OP_EOF");
   }
 
   // Core

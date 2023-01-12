@@ -1,13 +1,13 @@
-import { Chunk } from "./chunk";
+import { Instruction } from "./instruction";
 import { Scope } from "./scope";
 import { VirtualMachine } from "./virtual-machine";
 
 export class VMFunction {
-  constructor(private _chunks: Chunk[]) {}
+  constructor(private _chunks: Instruction[]) {}
 
-  instance(scope: Scope) {
+  instance(data: { scope: Scope }) {
     return new VirtualMachine(this._chunks, {
-      scope,
+      scope: data.scope,
     });
   }
 }

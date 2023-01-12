@@ -1,5 +1,5 @@
 import { VMVariable } from "./vm-variable";
-import { Chunk } from "./chunk";
+import { Instruction } from "./instruction";
 import { Scope } from "./scope";
 
 type VMState =
@@ -24,7 +24,7 @@ export class VirtualMachine {
   private _returnValue: any;
 
   constructor(
-    private _chunks: Chunk[],
+    private _chunks: Instruction[],
     config?: {
       scope?: Scope;
     }

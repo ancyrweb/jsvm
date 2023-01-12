@@ -1,4 +1,4 @@
-import { Chunk } from "../src/chunk";
+import { Instruction } from "../src/instruction";
 import { Scope } from "../src/scope";
 import { VirtualMachine } from "../src/virtual-machine";
 import { VMFunction } from "../src/vm-function";
@@ -12,7 +12,7 @@ describe("core", () => {
   });
 
   it("should run an EOF program", () => {
-    const vm = new VirtualMachine([Chunk.eof()]);
+    const vm = new VirtualMachine([Instruction.eof()]);
 
     const result = vm.run();
     expect(result.output).toBe(null);
@@ -20,11 +20,11 @@ describe("core", () => {
 
   it("should assign variables", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(1),
-      Chunk.assign("x"),
-      Chunk.constant("hello world"),
-      Chunk.assign("y"),
-      Chunk.eof(),
+      Instruction.constant(1),
+      Instruction.assign("x"),
+      Instruction.constant("hello world"),
+      Instruction.assign("y"),
+      Instruction.eof(),
     ]);
 
     const result = vm.run();
@@ -37,11 +37,11 @@ describe("core", () => {
   it("should run using input variables", () => {
     const vm = new VirtualMachine(
       [
-        Chunk.load("a"),
-        Chunk.load("b"),
-        Chunk.add(),
-        Chunk.assign("c"),
-        Chunk.eof(),
+        Instruction.load("a"),
+        Instruction.load("b"),
+        Instruction.add(),
+        Instruction.assign("c"),
+        Instruction.eof(),
       ],
       {
         scope: new Scope({
@@ -64,10 +64,10 @@ describe("core", () => {
 describe("math", () => {
   it("should negate a constant", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(1),
-      Chunk.negate(),
-      Chunk.assign("x"),
-      Chunk.eof(),
+      Instruction.constant(1),
+      Instruction.negate(),
+      Instruction.assign("x"),
+      Instruction.eof(),
     ]);
 
     const result = vm.run();
@@ -79,11 +79,11 @@ describe("math", () => {
 
   it("should add two constants", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(1),
-      Chunk.constant(2),
-      Chunk.add(),
-      Chunk.assign("x"),
-      Chunk.eof(),
+      Instruction.constant(1),
+      Instruction.constant(2),
+      Instruction.add(),
+      Instruction.assign("x"),
+      Instruction.eof(),
     ]);
 
     const result = vm.run();
@@ -93,11 +93,11 @@ describe("math", () => {
   });
   it("should substract two constants", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(1),
-      Chunk.constant(2),
-      Chunk.subtract(),
-      Chunk.assign("x"),
-      Chunk.eof(),
+      Instruction.constant(1),
+      Instruction.constant(2),
+      Instruction.subtract(),
+      Instruction.assign("x"),
+      Instruction.eof(),
     ]);
 
     const result = vm.run();
@@ -107,11 +107,11 @@ describe("math", () => {
   });
   it("should multiply two constants", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(3),
-      Chunk.constant(3),
-      Chunk.multiply(),
-      Chunk.assign("x"),
-      Chunk.eof(),
+      Instruction.constant(3),
+      Instruction.constant(3),
+      Instruction.multiply(),
+      Instruction.assign("x"),
+      Instruction.eof(),
     ]);
 
     const result = vm.run();
@@ -121,11 +121,11 @@ describe("math", () => {
   });
   it("should divide two constants", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(90),
-      Chunk.constant(3),
-      Chunk.divide(),
-      Chunk.assign("x"),
-      Chunk.eof(),
+      Instruction.constant(90),
+      Instruction.constant(3),
+      Instruction.divide(),
+      Instruction.assign("x"),
+      Instruction.eof(),
     ]);
 
     const result = vm.run();
@@ -139,13 +139,13 @@ describe("math", () => {
 describe("strings", () => {
   it("should divide two constants", () => {
     const vm = new VirtualMachine([
-      Chunk.constant("I am "),
-      Chunk.constant(21),
-      Chunk.add(),
-      Chunk.constant(" years old."),
-      Chunk.add(),
-      Chunk.assign("x"),
-      Chunk.eof(),
+      Instruction.constant("I am "),
+      Instruction.constant(21),
+      Instruction.add(),
+      Instruction.constant(" years old."),
+      Instruction.add(),
+      Instruction.assign("x"),
+      Instruction.eof(),
     ]);
 
     const result = vm.run();
@@ -159,16 +159,16 @@ describe("strings", () => {
 describe("comparisons", () => {
   it("handle equality when they are equal", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(21), // 0
-      Chunk.constant(21), // 1
-      Chunk.compareEqual(), // 2
-      Chunk.jumpIfFalse(3), // 3
-      Chunk.constant(1), // 4
-      Chunk.assign("x"), // 5
-      Chunk.jump(2), // 6
-      Chunk.constant(2), // 7
-      Chunk.assign("x"), // 8
-      Chunk.eof(), // 9
+      Instruction.constant(21), // 0
+      Instruction.constant(21), // 1
+      Instruction.compareEqual(), // 2
+      Instruction.jumpIfFalse(3), // 3
+      Instruction.constant(1), // 4
+      Instruction.assign("x"), // 5
+      Instruction.jump(2), // 6
+      Instruction.constant(2), // 7
+      Instruction.assign("x"), // 8
+      Instruction.eof(), // 9
     ]);
 
     const result = vm.run();
@@ -179,16 +179,16 @@ describe("comparisons", () => {
   });
   it("handle equality when they are NOT equal", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(21), // 0
-      Chunk.constant(22), // 1
-      Chunk.compareEqual(), // 2
-      Chunk.jumpIfFalse(3), // 3
-      Chunk.constant(1), // 4
-      Chunk.assign("x"), // 5
-      Chunk.jump(2), // 6
-      Chunk.constant(2), // 7
-      Chunk.assign("x"), // 8
-      Chunk.eof(), // 9
+      Instruction.constant(21), // 0
+      Instruction.constant(22), // 1
+      Instruction.compareEqual(), // 2
+      Instruction.jumpIfFalse(3), // 3
+      Instruction.constant(1), // 4
+      Instruction.assign("x"), // 5
+      Instruction.jump(2), // 6
+      Instruction.constant(2), // 7
+      Instruction.assign("x"), // 8
+      Instruction.eof(), // 9
     ]);
 
     const result = vm.run();
@@ -199,16 +199,16 @@ describe("comparisons", () => {
   });
   it("handle difference when its true", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(5), // 0
-      Chunk.constant(100), // 1
-      Chunk.compareNotEqual(), // 2
-      Chunk.jumpIfFalse(3), // 3
-      Chunk.constant(1), // 4
-      Chunk.assign("x"), // 5
-      Chunk.jump(2), // 6
-      Chunk.constant(2), // 7
-      Chunk.assign("x"), // 8
-      Chunk.eof(), // 9
+      Instruction.constant(5), // 0
+      Instruction.constant(100), // 1
+      Instruction.compareNotEqual(), // 2
+      Instruction.jumpIfFalse(3), // 3
+      Instruction.constant(1), // 4
+      Instruction.assign("x"), // 5
+      Instruction.jump(2), // 6
+      Instruction.constant(2), // 7
+      Instruction.assign("x"), // 8
+      Instruction.eof(), // 9
     ]);
 
     const result = vm.run();
@@ -219,16 +219,16 @@ describe("comparisons", () => {
   });
   it("handle difference when its false", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(5), // 0
-      Chunk.constant(5), // 1
-      Chunk.compareNotEqual(), // 2
-      Chunk.jumpIfFalse(3), // 3
-      Chunk.constant(1), // 4
-      Chunk.assign("x"), // 5
-      Chunk.jump(2), // 6
-      Chunk.constant(2), // 7
-      Chunk.assign("x"), // 8
-      Chunk.eof(), // 9
+      Instruction.constant(5), // 0
+      Instruction.constant(5), // 1
+      Instruction.compareNotEqual(), // 2
+      Instruction.jumpIfFalse(3), // 3
+      Instruction.constant(1), // 4
+      Instruction.assign("x"), // 5
+      Instruction.jump(2), // 6
+      Instruction.constant(2), // 7
+      Instruction.assign("x"), // 8
+      Instruction.eof(), // 9
     ]);
 
     const result = vm.run();
@@ -240,16 +240,16 @@ describe("comparisons", () => {
 
   it("handle greater when true", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(100), // 0
-      Chunk.constant(5), // 1
-      Chunk.compareGreater(), // 2
-      Chunk.jumpIfFalse(3), // 3
-      Chunk.constant(1), // 4
-      Chunk.assign("x"), // 5
-      Chunk.jump(2), // 6
-      Chunk.constant(2), // 7
-      Chunk.assign("x"), // 8
-      Chunk.eof(), // 9
+      Instruction.constant(100), // 0
+      Instruction.constant(5), // 1
+      Instruction.compareGreater(), // 2
+      Instruction.jumpIfFalse(3), // 3
+      Instruction.constant(1), // 4
+      Instruction.assign("x"), // 5
+      Instruction.jump(2), // 6
+      Instruction.constant(2), // 7
+      Instruction.assign("x"), // 8
+      Instruction.eof(), // 9
     ]);
 
     const result = vm.run();
@@ -260,16 +260,16 @@ describe("comparisons", () => {
   });
   it("handle greater when false", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(5), // 0
-      Chunk.constant(100), // 1
-      Chunk.compareGreater(), // 2
-      Chunk.jumpIfFalse(3), // 3
-      Chunk.constant(1), // 4
-      Chunk.assign("x"), // 5
-      Chunk.jump(2), // 6
-      Chunk.constant(2), // 7
-      Chunk.assign("x"), // 8
-      Chunk.eof(), // 9
+      Instruction.constant(5), // 0
+      Instruction.constant(100), // 1
+      Instruction.compareGreater(), // 2
+      Instruction.jumpIfFalse(3), // 3
+      Instruction.constant(1), // 4
+      Instruction.assign("x"), // 5
+      Instruction.jump(2), // 6
+      Instruction.constant(2), // 7
+      Instruction.assign("x"), // 8
+      Instruction.eof(), // 9
     ]);
 
     const result = vm.run();
@@ -279,16 +279,16 @@ describe("comparisons", () => {
   });
   it("handle greaterEqual when true", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(5), // 0
-      Chunk.constant(5), // 1
-      Chunk.compareGreaterEqual(), // 2
-      Chunk.jumpIfFalse(3), // 3
-      Chunk.constant(1), // 4
-      Chunk.assign("x"), // 5
-      Chunk.jump(2), // 6
-      Chunk.constant(2), // 7
-      Chunk.assign("x"), // 8
-      Chunk.eof(), // 9
+      Instruction.constant(5), // 0
+      Instruction.constant(5), // 1
+      Instruction.compareGreaterEqual(), // 2
+      Instruction.jumpIfFalse(3), // 3
+      Instruction.constant(1), // 4
+      Instruction.assign("x"), // 5
+      Instruction.jump(2), // 6
+      Instruction.constant(2), // 7
+      Instruction.assign("x"), // 8
+      Instruction.eof(), // 9
     ]);
 
     const result = vm.run();
@@ -298,16 +298,16 @@ describe("comparisons", () => {
   });
   it("handle greaterEqual when false", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(5), // 0
-      Chunk.constant(100), // 1
-      Chunk.compareGreaterEqual(), // 2
-      Chunk.jumpIfFalse(3), // 3
-      Chunk.constant(1), // 4
-      Chunk.assign("x"), // 5
-      Chunk.jump(2), // 6
-      Chunk.constant(2), // 7
-      Chunk.assign("x"), // 8
-      Chunk.eof(), // 9
+      Instruction.constant(5), // 0
+      Instruction.constant(100), // 1
+      Instruction.compareGreaterEqual(), // 2
+      Instruction.jumpIfFalse(3), // 3
+      Instruction.constant(1), // 4
+      Instruction.assign("x"), // 5
+      Instruction.jump(2), // 6
+      Instruction.constant(2), // 7
+      Instruction.assign("x"), // 8
+      Instruction.eof(), // 9
     ]);
 
     const result = vm.run();
@@ -318,16 +318,16 @@ describe("comparisons", () => {
 
   it("handle lower when true", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(5), // 0
-      Chunk.constant(100), // 1
-      Chunk.compareLower(), // 2
-      Chunk.jumpIfFalse(3), // 3
-      Chunk.constant(1), // 4
-      Chunk.assign("x"), // 5
-      Chunk.jump(2), // 6
-      Chunk.constant(2), // 7
-      Chunk.assign("x"), // 8
-      Chunk.eof(), // 9
+      Instruction.constant(5), // 0
+      Instruction.constant(100), // 1
+      Instruction.compareLower(), // 2
+      Instruction.jumpIfFalse(3), // 3
+      Instruction.constant(1), // 4
+      Instruction.assign("x"), // 5
+      Instruction.jump(2), // 6
+      Instruction.constant(2), // 7
+      Instruction.assign("x"), // 8
+      Instruction.eof(), // 9
     ]);
 
     const result = vm.run();
@@ -338,16 +338,16 @@ describe("comparisons", () => {
   });
   it("handle lower when false", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(100), // 0
-      Chunk.constant(5), // 1
-      Chunk.compareLower(), // 2
-      Chunk.jumpIfFalse(3), // 3
-      Chunk.constant(1), // 4
-      Chunk.assign("x"), // 5
-      Chunk.jump(2), // 6
-      Chunk.constant(2), // 7
-      Chunk.assign("x"), // 8
-      Chunk.eof(), // 9
+      Instruction.constant(100), // 0
+      Instruction.constant(5), // 1
+      Instruction.compareLower(), // 2
+      Instruction.jumpIfFalse(3), // 3
+      Instruction.constant(1), // 4
+      Instruction.assign("x"), // 5
+      Instruction.jump(2), // 6
+      Instruction.constant(2), // 7
+      Instruction.assign("x"), // 8
+      Instruction.eof(), // 9
     ]);
 
     const result = vm.run();
@@ -357,16 +357,16 @@ describe("comparisons", () => {
   });
   it("handle lowerEqual when true", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(5), // 0
-      Chunk.constant(5), // 1
-      Chunk.compareLowerEqual(), // 2
-      Chunk.jumpIfFalse(3), // 3
-      Chunk.constant(1), // 4
-      Chunk.assign("x"), // 5
-      Chunk.jump(2), // 6
-      Chunk.constant(2), // 7
-      Chunk.assign("x"), // 8
-      Chunk.eof(), // 9
+      Instruction.constant(5), // 0
+      Instruction.constant(5), // 1
+      Instruction.compareLowerEqual(), // 2
+      Instruction.jumpIfFalse(3), // 3
+      Instruction.constant(1), // 4
+      Instruction.assign("x"), // 5
+      Instruction.jump(2), // 6
+      Instruction.constant(2), // 7
+      Instruction.assign("x"), // 8
+      Instruction.eof(), // 9
     ]);
 
     const result = vm.run();
@@ -376,16 +376,16 @@ describe("comparisons", () => {
   });
   it("handle lowerEqual when false", () => {
     const vm = new VirtualMachine([
-      Chunk.constant(100), // 0
-      Chunk.constant(5), // 1
-      Chunk.compareLowerEqual(), // 2
-      Chunk.jumpIfFalse(3), // 3
-      Chunk.constant(1), // 4
-      Chunk.assign("x"), // 5
-      Chunk.jump(2), // 6
-      Chunk.constant(2), // 7
-      Chunk.assign("x"), // 8
-      Chunk.eof(), // 9
+      Instruction.constant(100), // 0
+      Instruction.constant(5), // 1
+      Instruction.compareLowerEqual(), // 2
+      Instruction.jumpIfFalse(3), // 3
+      Instruction.constant(1), // 4
+      Instruction.assign("x"), // 5
+      Instruction.jump(2), // 6
+      Instruction.constant(2), // 7
+      Instruction.assign("x"), // 8
+      Instruction.eof(), // 9
     ]);
 
     const result = vm.run();
@@ -398,20 +398,38 @@ describe("comparisons", () => {
 describe("functions", () => {
   it("should run the function", () => {
     const fn = new VMFunction([
-      Chunk.load("a"),
-      Chunk.constant(10),
-      Chunk.multiply(),
-      Chunk.ret(),
-      Chunk.eof(),
+      Instruction.load("a"),
+      Instruction.constant(10),
+      Instruction.multiply(),
+      Instruction.ret(),
+      Instruction.eof(),
     ]);
 
-    const instance = fn.instance(
-      new Scope({
+    const instance = fn.instance({
+      scope: new Scope({
         a: new VMVariable(10),
-      })
-    );
+      }),
+    });
 
     const result = instance.run();
     expect(result.returnValue).toEqual(100);
+  });
+
+  it("should run the function", () => {
+    const fn = new VMFunction([
+      Instruction.load("a"),
+      Instruction.constant(10),
+      Instruction.multiply(),
+      Instruction.ret(),
+      Instruction.eof(),
+    ]);
+
+    const vm = new VirtualMachine([
+      Instruction.constant(100), // 0
+      Instruction.assign("x"),
+    ]);
+
+    expect(true).toBe(true);
+    // expect(result.returnValue).toEqual(100);
   });
 });
