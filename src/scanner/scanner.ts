@@ -1,3 +1,4 @@
+import { Utils } from "../utils/utils";
 import { Keywords, Token, TokenType } from "./token";
 
 export class Scanner {
@@ -125,13 +126,13 @@ export class Scanner {
           break;
         }
         default: {
-          if (this.isDigit(next)) {
+          if (Utils.isDigit(next)) {
             this.number();
             break;
           } else if (next === '"') {
             this.string();
             break;
-          } else if (this.isAlpha(next)) {
+          } else if (Utils.isAlpha(next)) {
             this.keywordOrIdentifier();
           }
 
@@ -142,19 +143,19 @@ export class Scanner {
     }
   }
 
-  number() {
+  private number() {
     for (;;) {
-      while (this.isDigit(this.lookahead())) {
+      while (Utils.isDigit(this.lookahead())) {
         this.advance();
       }
 
       if (this.match(".")) {
-        if (!this.isDigit(this.lookahead())) {
+        if (!Utils.isDigit(this.lookahead())) {
           this.reportError("Expected number after .");
           return; // TODO synchronize
         }
 
-        while (this.isDigit(this.lookahead())) {
+        while (Utils.isDigit(this.lookahead())) {
           this.advance();
         }
 
@@ -167,7 +168,7 @@ export class Scanner {
     }
   }
 
-  string() {
+  private string() {
     while (!this.isEOF()) {
       const next = this.advance();
       if (next === '"') {
@@ -179,8 +180,8 @@ export class Scanner {
     this.reportError("Unfinished string.");
   }
 
-  keywordOrIdentifier() {
-    while (!this.isEOF() && this.isAlpha(this.lookahead())) {
+  private keywordOrIdentifier() {
+    while (!this.isEOF() && Utils.isAlpha(this.lookahead())) {
       this.advance();
     }
 
@@ -192,11 +193,7 @@ export class Scanner {
     }
   }
 
-  isAlpha(c: string) {
-    return (c >= "a" && c <= "z") || (c >= "A" && c <= "Z") || c == "_";
-  }
-
-  skipWhitespaces() {
+  private skipWhitespaces() {
     for (;;) {
       switch (this.lookahead()) {
         case " ":
@@ -227,24 +224,20 @@ export class Scanner {
     }
   }
 
-  isDigit(c: string) {
-    return c >= "0" && c <= "9";
-  }
-
-  lookahead() {
+  private lookahead() {
     return this.source[this.cursor];
   }
-  lookaheadNext() {
+  private lookaheadNext() {
     return this.source[this.cursor + 1];
   }
 
-  advance() {
+  private advance() {
     const symbol = this.source[this.cursor];
     this.cursor++;
     return symbol;
   }
 
-  match(symbol: string) {
+  private match(symbol: string) {
     if (!this.isEOF() && this.lookahead() === symbol) {
       this.advance();
       return true;
@@ -253,11 +246,11 @@ export class Scanner {
     return false;
   }
 
-  isEOF() {
+  private isEOF() {
     return this.cursor >= this.source.length;
   }
 
-  accept(type: TokenType) {
+  private accept(type: TokenType) {
     let lexeme;
     if (type === TokenType.STRING_LITERAL) {
       lexeme = this.source.slice(this.start + 1, this.cursor - 1);
@@ -276,7 +269,7 @@ export class Scanner {
     this.tokens.push(token);
   }
 
-  reportError(message: string) {
+  private reportError(message: string) {
     const meta =
       "At line " + this.line + " (" + this.start + ", " + this.cursor + ")";
 
