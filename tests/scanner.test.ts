@@ -36,6 +36,19 @@ describe("symbols", () => {
 
     expect(tokens).toMatchObject(expectedTokens);
   });
+  it("should parse logical ops", () => {
+    const source = `&& ||`;
+    const scanner = new Scanner(source);
+    const tokens = scanner.build();
+
+    const expectedTokens = [
+      new Token(TokenType.AND, 0, 0, 2, "&&"),
+      new Token(TokenType.OR, 0, 3, 2, "||"),
+      new Token(TokenType.EOF, 0, 5, 0, ""),
+    ];
+
+    expect(tokens).toMatchObject(expectedTokens);
+  });
 
   it("should parse numbers literals", () => {
     const source = `123456789 123.456789`;

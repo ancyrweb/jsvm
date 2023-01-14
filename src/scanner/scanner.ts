@@ -112,6 +112,18 @@ export class Scanner {
           }
           break;
         }
+        case "&": {
+          if (this.match("&")) {
+            this.accept(TokenType.AND);
+          }
+          break;
+        }
+        case "|": {
+          if (this.match("|")) {
+            this.accept(TokenType.OR);
+          }
+          break;
+        }
         default: {
           if (this.isDigit(next)) {
             this.number();

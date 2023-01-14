@@ -34,7 +34,11 @@ export enum TokenType {
   EQUAL = "equal",
   BANG = "bang",
 
-  // Unary Ops
+  // Logical Ops
+  AND = "And",
+  OR = "Or",
+
+  // Assignments
   PLUS_EQUAL = "plus_equal",
   MINUS_EQUAL = "minus_equal",
   STAR_EQUAL = "star_equal",
