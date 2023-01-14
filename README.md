@@ -6,17 +6,18 @@ The end-goal is to convert a program, convert it into bytecode and run.
 
 ## Demonstration Program
 ```
-function square(int a) : int {
+int square(int a) {
   return a * a;
 }
 
-int a = 0;
+const int a = 0;
 int b = 1 + a; // 1
 int c = 2 * a; // 2
 int d = 10 / a; // 5
 int e = 29 % d; // 4
 
 for (int i = 0; i < 5; i++) {
+  int a = 10;
   print("the new value is " + i);
 }
 
@@ -37,3 +38,16 @@ if (j < 1) {
 
 print(square(a + b + c + d * e));
 ```
+
+## Phases
+
+- Source Code
+- Lexical Analysis -> Serie of Tokens
+- Syntax Analysis -> Abstract Syntax Tree (Predictive Parser)
+  - AST Nodes (Expressions, Statements, Blocks, Functions)
+- Semantic Analysis
+  - Symbol Table (functions, variables, scopes)
+- Intermediate Representation 
+- ByteCode Generator
+- Virtual Machine Execution
+- Assembly Code
