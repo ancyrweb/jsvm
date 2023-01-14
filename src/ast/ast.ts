@@ -8,11 +8,11 @@ Block -> LEFT_BRACKET (Statements)* RIGHT_BRACKET
 
 ExpressionStatement -> Expression SEMICOLON
 
-Expression -> LogicalOr
-LogicalOr -> LogicalAnd | LogicalAnd OR LogicalAnd
-LogicalAnd -> Re | Re AND Re
-RelationalEquity (Re) -> Rd | Rd EQUAL_EQUAL Rd | Rd BANG_EQUAL Rd
-RelationalDifference (Rd) -> Term | Term LOWER Term | Term LOWER_EQUAL Term | Term GREATER Term | Term GREATER_EQUAL Term
+Expression -> Or
+Or -> And | And OR And
+And -> Eq | Eq AND Eq
+Equality (Eq) -> Cp | Cp EQUAL_EQUAL Cp | Cp BANG_EQUAL Cp
+Comparison (Cp) -> Term | Term LOWER Term | Term LOWER_EQUAL Term | Term GREATER Term | Term GREATER_EQUAL Term
 Term -> Factor | Factor PLUS Factor | Factor MINUS Factor
 Factor -> PrefixUnary | PrefixUnary STAR PrefixUnary | PrefixUnary SLASH PrefixUnary | PrefixUnary MODULO PrefixUnary
 PrefixUnary -> (MINUS | BANG | PLUS_PLUS | MINUS_MINUS)? Grouping

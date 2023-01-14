@@ -11,32 +11,33 @@ const tfloat = (val: string) => tok(TokenType.FLOAT_LITERAL, val);
 const tstring = (val: string) => tok(TokenType.STRING_LITERAL, val);
 const tid = (val: string) => tok(TokenType.IDENTIFIER, val);
 const eof = () => tok(TokenType.EOF, "");
+const sc = () => tok(TokenType.SEMICOLON, ";");
 
 describe("parser", () => {
   describe("literals", () => {
     it("should parse an integer literal", () => {
-      const parser = new Parser([tint("1"), eof()]);
+      const parser = new Parser([tint("1"), sc(), eof()]);
 
       const program = parser.parse();
       const node = program.at<AST.Literal<number>>(0);
       expect(node.unfold()).toEqual(1);
     });
     it("should parse a floating literal", () => {
-      const parser = new Parser([tfloat("10.50"), eof()]);
+      const parser = new Parser([tfloat("10.50"), sc(), eof()]);
 
       const program = parser.parse();
       const node = program.at<AST.Literal<number>>(0);
       expect(node.unfold()).toEqual(10.5);
     });
     it("should parse a string literal", () => {
-      const parser = new Parser([tstring("10.50"), eof()]);
+      const parser = new Parser([tstring("10.50"), sc(), eof()]);
 
       const program = parser.parse();
       const node = program.at<AST.Literal<string>>(0);
       expect(node.unfold()).toEqual("10.50");
     });
     it("should parse an identifier literal", () => {
-      const parser = new Parser([tid("myVar"), eof()]);
+      const parser = new Parser([tid("myVar"), sc(), eof()]);
 
       const program = parser.parse();
       const node = program.at<AST.Literal<string>>(0);
@@ -52,6 +53,7 @@ describe("parser", () => {
         new Token(TokenType.PLUS, 0, 0, 0, "+"),
         tint("2"),
         new Token(TokenType.PAREN_RIGHT, 0, 0, 0, ")"),
+        sc(),
         eof(),
       ]);
 
@@ -66,6 +68,7 @@ describe("parser", () => {
       const parser = new Parser([
         new Token(TokenType.BANG, 0, 0, 0, "!"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -79,6 +82,7 @@ describe("parser", () => {
       const parser = new Parser([
         new Token(TokenType.MINUS, 0, 0, 0, "-"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -92,6 +96,7 @@ describe("parser", () => {
       const parser = new Parser([
         new Token(TokenType.PLUS_PLUS, 0, 0, 0, "++"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -105,6 +110,7 @@ describe("parser", () => {
       const parser = new Parser([
         new Token(TokenType.MINUS_MINUS, 0, 0, 0, "-"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -121,6 +127,7 @@ describe("parser", () => {
         tint("1"),
         new Token(TokenType.STAR, 0, 0, 0, "+"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -136,6 +143,7 @@ describe("parser", () => {
         tint("1"),
         new Token(TokenType.SLASH, 0, 0, 0, "+"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -153,6 +161,7 @@ describe("parser", () => {
         tint("2"),
         new Token(TokenType.SLASH, 0, 0, 0, "/"),
         new Token(TokenType.INTEGER_LITERAL, 0, 0, 0, "3"),
+        sc(),
         eof(),
       ]);
 
@@ -176,6 +185,7 @@ describe("parser", () => {
         tint("1"),
         new Token(TokenType.PLUS, 0, 0, 0, "+"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -191,6 +201,7 @@ describe("parser", () => {
         tint("1"),
         new Token(TokenType.MINUS, 0, 0, 0, "+"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -208,6 +219,7 @@ describe("parser", () => {
         tint("2"),
         new Token(TokenType.PLUS, 0, 0, 0, "+"),
         new Token(TokenType.INTEGER_LITERAL, 0, 0, 0, "3"),
+        sc(),
         eof(),
       ]);
 
@@ -232,6 +244,7 @@ describe("parser", () => {
         tint("1"),
         new Token(TokenType.GREATER, 0, 0, 0, ">"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -247,6 +260,7 @@ describe("parser", () => {
         tint("1"),
         new Token(TokenType.GREATER_EQUAL, 0, 0, 0, "+"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -261,6 +275,7 @@ describe("parser", () => {
         tint("1"),
         new Token(TokenType.LOWER, 0, 0, 0, "+"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -275,6 +290,7 @@ describe("parser", () => {
         tint("1"),
         new Token(TokenType.LOWER_EQUAL, 0, 0, 0, "+"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -292,6 +308,7 @@ describe("parser", () => {
         tint("1"),
         new Token(TokenType.EQUAL_EQUAL, 0, 0, 0, "=="),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -307,6 +324,7 @@ describe("parser", () => {
         tint("1"),
         new Token(TokenType.BANG_EQUAL, 0, 0, 0, "!="),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -323,6 +341,7 @@ describe("parser", () => {
         tint("1"),
         new Token(TokenType.AND, 0, 0, 0, "&&"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -338,6 +357,7 @@ describe("parser", () => {
         tint("1"),
         new Token(TokenType.OR, 0, 0, 0, "||"),
         tint("2"),
+        sc(),
         eof(),
       ]);
 
@@ -352,7 +372,7 @@ describe("parser", () => {
 
 describe("integration with scanner", () => {
   it("should parse a small expression", () => {
-    const tokens = new Scanner("1 * (2 + 3) / 4 - 5").build();
+    const tokens = new Scanner("1 * (2 + 3) / 4 - 5;").build();
     const program = new Parser(tokens).parse();
 
     // console.log(program.toString());

@@ -7,8 +7,14 @@ export class Parser {
   constructor(private tokens: Token[]) {}
 
   parse(): AST.Program {
-    const next = this.expression();
+    const next = this.expressionStatement();
     return new AST.Program([next]);
+  }
+
+  expressionStatement() {
+    const expr = this.expression();
+    this.consume(TokenType.SEMICOLON);
+    return expr;
   }
 
   // #####################
@@ -16,43 +22,43 @@ export class Parser {
   // #####################
 
   expression() {
-    return this.logicalOr();
+    return this.or();
   }
 
-  logicalOr() {
-    let expr: AST.Expression = this.logicalAnd();
+  or() {
+    let expr: AST.Expression = this.and();
 
     while (this.match(TokenType.OR)) {
       const operator = AST.tokenToBinOp(this.previous().type);
-      const right = this.logicalAnd();
+      const right = this.and();
       expr = new AST.BinaryExpression(expr, right, operator);
     }
     return expr;
   }
 
-  logicalAnd() {
-    let expr: AST.Expression = this.relationalEquality();
+  and() {
+    let expr: AST.Expression = this.equality();
 
     while (this.match(TokenType.AND)) {
       const operator = AST.tokenToBinOp(this.previous().type);
-      const right = this.relationalEquality();
+      const right = this.equality();
       expr = new AST.BinaryExpression(expr, right, operator);
     }
     return expr;
   }
 
-  relationalEquality() {
-    let expr: AST.Expression = this.relationalDifference();
+  equality() {
+    let expr: AST.Expression = this.comparison();
 
     while (this.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL)) {
       const operator = AST.tokenToBinOp(this.previous().type);
-      const right = this.relationalDifference();
+      const right = this.comparison();
       expr = new AST.BinaryExpression(expr, right, operator);
     }
     return expr;
   }
 
-  relationalDifference() {
+  comparison() {
     let expr: AST.Expression = this.term();
 
     while (
@@ -175,13 +181,13 @@ export class Parser {
     }
   }
 
-  private consume(token: TokenType) {
+  private consume(token: TokenType, message?: string) {
     if (this.lookahead().type === token) {
       this.advance();
       return;
     }
 
-    this.reportError("Expected token " + token + ".");
+    this.reportError(message ?? "Expected token " + token + ".");
   }
 
   private check(type: TokenType) {
