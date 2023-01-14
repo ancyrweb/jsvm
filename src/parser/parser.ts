@@ -20,10 +20,28 @@ export class Parser {
       return this.variableDeclarationOrDefinition();
     } else if (this.match(TokenType.IF)) {
       return this.conditional();
+    } else if (this.match(TokenType.WHILE)) {
+      return this.whileLoop();
+    } else if (this.check(TokenType.IDENTIFIER)) {
+      if (
+        this.checkAt(
+          1,
+          TokenType.EQUAL,
+          TokenType.PLUS_EQUAL,
+          TokenType.MINUS_EQUAL,
+          TokenType.STAR_EQUAL,
+          TokenType.SLASH_EQUAL,
+          TokenType.MODULO_EQUAL
+        )
+      ) {
+        this.match(TokenType.IDENTIFIER);
+        return this.assignment();
+      }
     }
 
     return this.expressionStatement();
   }
+
   variableDeclarationOrDefinition() {
     const type = this.previous();
     const name = this.consume(TokenType.IDENTIFIER);
@@ -70,6 +88,42 @@ export class Parser {
     }
 
     return new AST.Conditional(expr, new AST.Block(statements), elseBranch);
+  }
+
+  whileLoop(): AST.WhileLoop {
+    this.consume(TokenType.PAREN_LEFT);
+    const expr = this.expression();
+    this.consume(TokenType.PAREN_RIGHT);
+    this.consume(TokenType.BRACE_LEFT);
+
+    const statements: AST.Statement[] = [];
+    while (!this.match(TokenType.BRACE_RIGHT)) {
+      statements.push(this.statement());
+    }
+
+    if (this.previous().type !== TokenType.BRACE_RIGHT) {
+      this.reportError("Expected '}' at the end of conditional.");
+    }
+
+    return new AST.WhileLoop(expr, new AST.Block(statements));
+  }
+
+  assignment() {
+    const identifier = this.previous();
+    this.match(
+      TokenType.EQUAL,
+      TokenType.PLUS_EQUAL,
+      TokenType.MINUS_EQUAL,
+      TokenType.STAR_EQUAL,
+      TokenType.SLASH_EQUAL,
+      TokenType.MODULO_EQUAL
+    );
+
+    const type: AST.AssignmentType = this.previous().type as AST.AssignmentType;
+    const expr = this.expression();
+    this.consume(TokenType.SEMICOLON);
+
+    return new AST.VariableAssignment(identifier!.lexeme, type, expr);
   }
 
   expressionStatement() {
@@ -199,6 +253,7 @@ export class Parser {
     );
 
     const previous = this.previous();
+
     switch (previous.type) {
       case TokenType.INTEGER_LITERAL: {
         return AST.IntValue.fromToken(previous);
@@ -210,7 +265,13 @@ export class Parser {
         return AST.StringValue.fromToken(previous);
       }
       case TokenType.IDENTIFIER: {
-        return AST.IdentifierValue.fromToken(previous);
+        const identifier = AST.IdentifierValue.fromToken(previous);
+        if (this.match(TokenType.PLUS_PLUS, TokenType.MINUS_MINUS)) {
+          const type = this.previous().type as AST.PostfixIncrementType;
+          return new AST.PostfixIncrement(identifier, type);
+        }
+
+        return identifier;
       }
       default: {
         throw new Error("Unreachable.");
@@ -249,12 +310,16 @@ export class Parser {
   }
 
   private check(...types: TokenType[]) {
+    return this.checkAt(0, ...types);
+  }
+
+  private checkAt(at: number, ...types: TokenType[]) {
     if (this.isEOF()) {
       return false;
     }
 
     for (let type of types) {
-      if (this.lookahead().type === type) {
+      if (this.lookahead(at).type === type) {
         return true;
       }
     }
@@ -262,8 +327,8 @@ export class Parser {
     return false;
   }
 
-  private lookahead() {
-    return this.tokens[this.cursor];
+  private lookahead(at = 0) {
+    return this.tokens[this.cursor + at];
   }
 
   private isEOF() {

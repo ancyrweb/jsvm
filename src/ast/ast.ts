@@ -17,7 +17,7 @@ Term -> Factor | Factor PLUS Factor | Factor MINUS Factor
 Factor -> PrefixUnary | PrefixUnary STAR PrefixUnary | PrefixUnary SLASH PrefixUnary | PrefixUnary MODULO PrefixUnary
 PrefixUnary -> (MINUS | BANG | PLUS_PLUS | MINUS_MINUS)? Grouping
 Grouping -> Literal | LEFT_PAREN Expression RIGHT_PAREN
-Primary -> IDENTIFIER | STRING_LITERAL | NUMBER_LITERAL | FLOAT_LITERAL
+Primary -> IDENTIFIER (PLUS_PLUS | MINUS_MINUS)? | STRING_LITERAL | NUMBER_LITERAL | FLOAT_LITERAL
 
 VariableType -> INT
 VariableDeclaration -> (CONST)? VariableType IDENTIFIER
@@ -298,6 +298,31 @@ export namespace AST {
     }
   }
 
+  export type PostfixIncrementType =
+    | TokenType.PLUS_PLUS
+    | TokenType.MINUS_MINUS;
+
+  export class PostfixIncrement extends Literal<any> {
+    constructor(
+      private _identifier: IdentifierValue,
+      private _type: PostfixIncrementType
+    ) {
+      super();
+    }
+
+    identifier() {
+      return this._identifier;
+    }
+
+    type() {
+      return this._type;
+    }
+
+    unfold() {
+      return this._identifier.unfold();
+    }
+  }
+
   export class VariableDefinition extends Statement {
     constructor(
       private _type: string,
@@ -313,6 +338,36 @@ export namespace AST {
 
     name() {
       return this._name;
+    }
+
+    expr<T extends Expression = Expression>() {
+      return this._expr as T;
+    }
+  }
+
+  export type AssignmentType =
+    | TokenType.EQUAL
+    | TokenType.PLUS_EQUAL
+    | TokenType.MINUS_EQUAL
+    | TokenType.STAR_EQUAL
+    | TokenType.SLASH_EQUAL
+    | TokenType.MODULO_EQUAL;
+
+  export class VariableAssignment extends Statement {
+    constructor(
+      private _identifier: string,
+      private _type: AssignmentType,
+      private _expr: Expression
+    ) {
+      super();
+    }
+
+    identifier() {
+      return this._identifier;
+    }
+
+    type() {
+      return this._type;
     }
 
     expr<T extends Expression = Expression>() {
@@ -367,6 +422,20 @@ export namespace AST {
 
     elseBranch() {
       return this._elseBranch;
+    }
+  }
+
+  export class WhileLoop extends Statement {
+    constructor(private _expr: Expression, private _block: Block) {
+      super();
+    }
+
+    expr<T extends Expression>() {
+      return this._expr as T;
+    }
+
+    block() {
+      return this._block;
     }
   }
 }

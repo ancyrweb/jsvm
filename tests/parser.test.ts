@@ -21,9 +21,14 @@ const tparenleft = () => tok(TokenType.PAREN_LEFT, "(");
 const tparenright = () => tok(TokenType.PAREN_RIGHT, ")");
 const tbraceleft = () => tok(TokenType.BRACE_LEFT, "{");
 const tbraceright = () => tok(TokenType.BRACE_RIGHT, "}");
+const twhile = () => tok(TokenType.WHILE, "while");
+const tfor = () => tok(TokenType.FOR, "for");
+const tdo = () => tok(TokenType.DO, "do");
+const tplusplus = () => tok(TokenType.PLUS_PLUS, "++");
+const tminusminus = () => tok(TokenType.MINUS_MINUS, "--");
 
 describe("expressions", () => {
-  describe("literals", () => {
+  describe("primary", () => {
     it("should parse an integer literal", () => {
       const parser = new Parser([tintlit("1"), sc(), eof()]);
 
@@ -50,7 +55,24 @@ describe("expressions", () => {
 
       const program = parser.parse();
       const node = program.at<AST.Literal<string>>(0);
+
       expect(node.unfold()).toEqual("myVar");
+    });
+    it("should parse a postfix increment", () => {
+      const parser = new Parser([tid("myVar"), tplusplus(), sc(), eof()]);
+
+      const program = parser.parse();
+      const node = program.at<AST.PostfixIncrement>(0);
+      expect(node.type()).toBe(TokenType.PLUS_PLUS);
+      expect(node.identifier().unfold()).toBe("myVar");
+    });
+    it("should parse a postfix decrement", () => {
+      const parser = new Parser([tid("myVar"), tminusminus(), sc(), eof()]);
+
+      const program = parser.parse();
+      const node = program.at<AST.PostfixIncrement>(0);
+      expect(node.type()).toBe(TokenType.MINUS_MINUS);
+      expect(node.identifier().unfold()).toBe("myVar");
     });
   });
 
@@ -101,7 +123,7 @@ describe("expressions", () => {
       expect(node.operator()).toEqual(AST.PrefixOperator.ARITHMETIC_NEGATE);
     });
 
-    it("should parse the increment", () => {
+    it("should parse the prefix increment", () => {
       const parser = new Parser([
         new Token(TokenType.PLUS_PLUS, 0, 0, 0, "++"),
         tintlit("2"),
@@ -115,7 +137,7 @@ describe("expressions", () => {
       expect(node.operator()).toEqual(AST.PrefixOperator.INCREMENT);
     });
 
-    it("should parse the decrement", () => {
+    it("should parse the prefix decrement", () => {
       const parser = new Parser([
         new Token(TokenType.MINUS_MINUS, 0, 0, 0, "-"),
         tintlit("2"),
@@ -396,6 +418,109 @@ describe("variable declarations, definitions & assignments", () => {
     expect(node.type()).toBe("float");
     expect(node.name()).toBe("myVar");
   });
+  it("`myVar = 1;", () => {
+    const parser = new Parser([
+      tid("myVar"),
+      tok(TokenType.EQUAL, "="),
+      tintlit("1"),
+      sc(),
+      eof(),
+    ]);
+
+    const program = parser.parse();
+    const node = program.at<AST.VariableAssignment>(0);
+    expect(node.type()).toBe(TokenType.EQUAL);
+    expect(node.identifier()).toBe("myVar");
+
+    const expr = node.expr<AST.Literal<number>>();
+    expect(expr.unfold()).toEqual(1);
+  });
+
+  it("`myVar += 1;", () => {
+    const parser = new Parser([
+      tid("myVar"),
+      tok(TokenType.PLUS_EQUAL, "+="),
+      tintlit("1"),
+      sc(),
+      eof(),
+    ]);
+
+    const program = parser.parse();
+    const node = program.at<AST.VariableAssignment>(0);
+    expect(node.type()).toBe(TokenType.PLUS_EQUAL);
+    expect(node.identifier()).toBe("myVar");
+
+    const expr = node.expr<AST.Literal<number>>();
+    expect(expr.unfold()).toEqual(1);
+  });
+  it("`myVar -= 1;", () => {
+    const parser = new Parser([
+      tid("myVar"),
+      tok(TokenType.MINUS_EQUAL, "-="),
+      tintlit("1"),
+      sc(),
+      eof(),
+    ]);
+
+    const program = parser.parse();
+    const node = program.at<AST.VariableAssignment>(0);
+    expect(node.type()).toBe(TokenType.MINUS_EQUAL);
+    expect(node.identifier()).toBe("myVar");
+
+    const expr = node.expr<AST.Literal<number>>();
+    expect(expr.unfold()).toEqual(1);
+  });
+  it("`myVar *= 1;", () => {
+    const parser = new Parser([
+      tid("myVar"),
+      tok(TokenType.STAR_EQUAL, "*="),
+      tintlit("1"),
+      sc(),
+      eof(),
+    ]);
+
+    const program = parser.parse();
+    const node = program.at<AST.VariableAssignment>(0);
+    expect(node.type()).toBe(TokenType.STAR_EQUAL);
+    expect(node.identifier()).toBe("myVar");
+
+    const expr = node.expr<AST.Literal<number>>();
+    expect(expr.unfold()).toEqual(1);
+  });
+  it("`myVar /= 1;", () => {
+    const parser = new Parser([
+      tid("myVar"),
+      tok(TokenType.SLASH_EQUAL, "/="),
+      tintlit("1"),
+      sc(),
+      eof(),
+    ]);
+
+    const program = parser.parse();
+    const node = program.at<AST.VariableAssignment>(0);
+    expect(node.type()).toBe(TokenType.SLASH_EQUAL);
+    expect(node.identifier()).toBe("myVar");
+
+    const expr = node.expr<AST.Literal<number>>();
+    expect(expr.unfold()).toEqual(1);
+  });
+  it("`myVar %= 1;", () => {
+    const parser = new Parser([
+      tid("myVar"),
+      tok(TokenType.MODULO_EQUAL, "%="),
+      tintlit("1"),
+      sc(),
+      eof(),
+    ]);
+
+    const program = parser.parse();
+    const node = program.at<AST.VariableAssignment>(0);
+    expect(node.type()).toBe(TokenType.MODULO_EQUAL);
+    expect(node.identifier()).toBe("myVar");
+
+    const expr = node.expr<AST.Literal<number>>();
+    expect(expr.unfold()).toEqual(1);
+  });
 
   it("should parse a variable definition - `int myVar = 1;`", () => {
     const parser = new Parser([
@@ -574,6 +699,43 @@ describe("conditionals", () => {
     expect(elseBranch.elseBranch()).toBe(null);
   });
 });
+
+describe("while", () => {
+  it("`while(1) { myVar = 1; }", () => {
+    const parser = new Parser([
+      twhile(),
+      tparenleft(),
+      tintlit("1"),
+      tparenright(),
+      tbraceleft(),
+      // Content
+      tid("myVar"),
+      tok(TokenType.EQUAL, "="),
+      tintlit("1"),
+      sc(),
+      // End Content,
+      tbraceright(),
+    ]);
+
+    const program = parser.parse();
+    const node = program.at<AST.WhileLoop>(0);
+
+    const expr = node.expr<AST.Literal<number>>();
+    expect(expr.unfold()).toEqual(1);
+
+    const block = node.block();
+    expect(block).toBeInstanceOf(AST.Block);
+    expect(block.length()).toBe(1);
+
+    const stmt = block.at<AST.VariableAssignment>(0);
+    expect(stmt.identifier()).toBe("myVar");
+    expect(stmt.type()).toBe(TokenType.EQUAL);
+
+    const stmtExpr = stmt.expr<AST.Literal<number>>();
+    expect(stmtExpr.unfold()).toEqual(1);
+  });
+});
+
 describe("integration with scanner", () => {
   it("should parse a small expression", () => {
     const tokens = new Scanner("1 * (2 + 3) / 4 - 5;").build();
