@@ -283,4 +283,90 @@ export namespace AST {
       return `IDENTIFIER(${this.value.toString()})`;
     }
   }
+
+  export class VariableDeclaration extends Statement {
+    constructor(private _type: string, private _name: string) {
+      super();
+    }
+
+    type() {
+      return this._type;
+    }
+
+    name() {
+      return this._name;
+    }
+  }
+
+  export class VariableDefinition extends Statement {
+    constructor(
+      private _type: string,
+      private _name: string,
+      private _expr: Expression
+    ) {
+      super();
+    }
+
+    type() {
+      return this._type;
+    }
+
+    name() {
+      return this._name;
+    }
+
+    expr<T extends Expression = Expression>() {
+      return this._expr as T;
+    }
+  }
+
+  export class Block {
+    constructor(private _statements: Statement[]) {}
+
+    statements() {
+      return this._statements;
+    }
+
+    length() {
+      return this._statements.length;
+    }
+
+    at<T extends ASTNode>(index: number): T {
+      if (index >= this._statements.length) {
+        throw new Error("Out of bounds");
+      }
+
+      return this._statements[index] as T;
+    }
+
+    nodesLength() {
+      return this._statements.length;
+    }
+
+    toString() {
+      return this._statements.map((n) => n.toString()).join("\n");
+    }
+  }
+
+  export class Conditional extends Statement {
+    constructor(
+      private _expr: Expression,
+      private _ifBranch: Block,
+      private _elseBranch: null | Block | Conditional
+    ) {
+      super();
+    }
+
+    expr<T extends Expression>() {
+      return this._expr as T;
+    }
+
+    ifBranch() {
+      return this._ifBranch;
+    }
+
+    elseBranch() {
+      return this._elseBranch;
+    }
+  }
 }

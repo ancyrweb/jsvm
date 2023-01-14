@@ -9,6 +9,7 @@ export enum TokenType {
   ELSE = "else",
   RETURN = "return",
   FOR = "for",
+  FLOAT = "float",
 
   // Single Character Tokens
   BRACE_LEFT = "brace_left",
@@ -67,6 +68,7 @@ export const Keywords = [
   TokenType.ELSE,
   TokenType.RETURN,
   TokenType.FOR,
+  TokenType.FLOAT,
 ];
 
 export class Token {

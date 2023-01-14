@@ -76,7 +76,7 @@ describe("symbols", () => {
     expect(tokens).toMatchObject(expectedTokens);
   });
   it("should parse keywords", () => {
-    const source = `int const break continue while do if else return for this_is_an_identifier`;
+    const source = `int const break continue while do if else return for float this_is_an_identifier`;
     const scanner = new Scanner(source);
     const tokens = scanner.build();
 
@@ -91,8 +91,9 @@ describe("symbols", () => {
       new Token(TokenType.ELSE, 0, 37, 4, "else"),
       new Token(TokenType.RETURN, 0, 42, 6, "return"),
       new Token(TokenType.FOR, 0, 49, 3, "for"),
-      new Token(TokenType.IDENTIFIER, 0, 53, 21, "this_is_an_identifier"),
-      new Token(TokenType.EOF, 0, 74, 0, ""),
+      new Token(TokenType.FLOAT, 0, 53, 5, "float"),
+      new Token(TokenType.IDENTIFIER, 0, 59, 21, "this_is_an_identifier"),
+      new Token(TokenType.EOF, 0, 80, 0, ""),
     ];
 
     expect(tokens).toMatchObject(expectedTokens);

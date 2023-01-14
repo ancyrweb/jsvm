@@ -7,8 +7,69 @@ export class Parser {
   constructor(private tokens: Token[]) {}
 
   parse(): AST.Program {
-    const next = this.expressionStatement();
-    return new AST.Program([next]);
+    const nodes = [];
+    while (this.isEOF() === false) {
+      nodes.push(this.statement());
+    }
+
+    return new AST.Program(nodes);
+  }
+
+  statement(): AST.Statement {
+    if (this.match(TokenType.INT, TokenType.FLOAT)) {
+      return this.variableDeclarationOrDefinition();
+    } else if (this.match(TokenType.IF)) {
+      return this.conditional();
+    }
+
+    return this.expressionStatement();
+  }
+  variableDeclarationOrDefinition() {
+    const type = this.previous();
+    const name = this.consume(TokenType.IDENTIFIER);
+
+    if (this.match(TokenType.EQUAL)) {
+      const expr = this.expression();
+      this.consume(TokenType.SEMICOLON);
+      return new AST.VariableDefinition(type!.lexeme, name!.lexeme, expr);
+    }
+
+    this.consume(TokenType.SEMICOLON);
+    return new AST.VariableDeclaration(type!.lexeme, name!.lexeme);
+  }
+
+  conditional(): AST.Conditional {
+    this.consume(TokenType.PAREN_LEFT);
+    const expr = this.expression();
+    this.consume(TokenType.PAREN_RIGHT);
+    this.consume(TokenType.BRACE_LEFT);
+
+    const statements: AST.Statement[] = [];
+    while (!this.match(TokenType.BRACE_RIGHT)) {
+      statements.push(this.statement());
+    }
+
+    if (this.previous().type !== TokenType.BRACE_RIGHT) {
+      this.reportError("Expected '}' at the end of conditional.");
+    }
+
+    let elseBranch = null;
+    if (this.match(TokenType.ELSE)) {
+      if (this.match(TokenType.IF)) {
+        elseBranch = this.conditional();
+      } else {
+        this.consume(TokenType.BRACE_LEFT);
+
+        const statements = [];
+        while (!this.match(TokenType.BRACE_RIGHT)) {
+          statements.push(this.statement());
+        }
+
+        elseBranch = new AST.Block(statements);
+      }
+    }
+
+    return new AST.Conditional(expr, new AST.Block(statements), elseBranch);
   }
 
   expressionStatement() {
@@ -173,29 +234,32 @@ export class Parser {
   }
 
   private match(...types: TokenType[]) {
-    for (let type of types) {
-      if (this.check(type)) {
-        this.advance();
-        return true;
-      }
+    if (this.check(...types)) {
+      this.advance();
+      return true;
     }
   }
 
   private consume(token: TokenType, message?: string) {
     if (this.lookahead().type === token) {
-      this.advance();
-      return;
+      return this.advance();
     }
 
     this.reportError(message ?? "Expected token " + token + ".");
   }
 
-  private check(type: TokenType) {
+  private check(...types: TokenType[]) {
     if (this.isEOF()) {
       return false;
     }
 
-    return this.lookahead().type === type;
+    for (let type of types) {
+      if (this.lookahead().type === type) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private lookahead() {
