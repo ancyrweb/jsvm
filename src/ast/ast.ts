@@ -302,9 +302,21 @@ export namespace AST {
     }
   }
 
-  export type PostfixIncrementType =
-    | TokenType.PLUS_PLUS
-    | TokenType.MINUS_MINUS;
+  export enum PostfixIncrementType {
+    INCREMENT = "increment",
+    DECREMENT = "decrement",
+  }
+
+  export const tokenToPostfixIncrement = (type: TokenType) => {
+    switch (type) {
+      case TokenType.PLUS_PLUS:
+        return PostfixIncrementType.INCREMENT;
+      case TokenType.MINUS_MINUS:
+        return PostfixIncrementType.DECREMENT;
+    }
+
+    throw new Error("Unrecognized postfix type " + type + ".");
+  };
 
   export class PostfixIncrement extends Literal<any> {
     constructor(

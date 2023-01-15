@@ -267,8 +267,11 @@ export class Parser {
       case TokenType.IDENTIFIER: {
         const identifier = AST.IdentifierValue.fromToken(previous);
         if (this.match(TokenType.PLUS_PLUS, TokenType.MINUS_MINUS)) {
-          const type = this.previous().type as AST.PostfixIncrementType;
-          return new AST.PostfixIncrement(identifier, type);
+          const type = this.previous().type;
+          return new AST.PostfixIncrement(
+            identifier,
+            AST.tokenToPostfixIncrement(type)
+          );
         }
 
         return identifier;

@@ -154,6 +154,24 @@ export class BytecodeGenerator {
 
       this.add(new ByteCode.StoreReg(reg));
       return reg;
+    } else if (node instanceof AST.PostfixIncrement) {
+      this.add(new ByteCode.LoadVar(node.identifier().unfold()))
+      const reg = this.allocator.alloc()
+      this.add(new ByteCode.StoreReg(reg), new ByteCode.LoadReg(reg));
+
+      switch (node.type()) {
+        case AST.PostfixIncrementType.INCREMENT: {
+          this.add(new ByteCode.Increment());
+          break;
+        }
+        case AST.PostfixIncrementType.DECREMENT: {
+          this.add(new ByteCode.Decrement());
+          break;
+        }
+      }
+
+      this.add(new ByteCode.StoreReg(reg));
+      return reg;
     }
 
     throw new Error("Unreachable");

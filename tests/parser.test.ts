@@ -63,7 +63,7 @@ describe("expressions", () => {
 
       const program = parser.parse();
       const node = program.at<AST.PostfixIncrement>(0);
-      expect(node.type()).toBe(TokenType.PLUS_PLUS);
+      expect(node.type()).toBe(AST.PostfixIncrementType.INCREMENT);
       expect(node.identifier().unfold()).toBe("myVar");
     });
     it("should parse a postfix decrement", () => {
@@ -71,7 +71,7 @@ describe("expressions", () => {
 
       const program = parser.parse();
       const node = program.at<AST.PostfixIncrement>(0);
-      expect(node.type()).toBe(TokenType.MINUS_MINUS);
+      expect(node.type()).toBe(AST.PostfixIncrementType.DECREMENT);
       expect(node.identifier().unfold()).toBe("myVar");
     });
   });

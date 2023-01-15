@@ -84,14 +84,14 @@ describe("arithmetic", () => {
     it("should increment a int value", () => {
       const program = new AST.Program([
         new AST.PrefixExpression(
-          new AST.IntValue(1),
+          new AST.IdentifierValue("myVar"),
           AST.PrefixOperator.INCREMENT
         ),
       ]);
 
       const instructions = new BytecodeGenerator(program).generate();
       expect(instructions).toMatchObject([
-        new ByteCode.LoadInt(1),
+        new ByteCode.LoadVar("myVar"),
         new ByteCode.StoreReg(Register.id(0)),
 
         new ByteCode.LoadReg(Register.id(0)),
@@ -102,14 +102,53 @@ describe("arithmetic", () => {
     it("should decrement a int value", () => {
       const program = new AST.Program([
         new AST.PrefixExpression(
-          new AST.IntValue(1),
+          new AST.IdentifierValue("myVar"),
           AST.PrefixOperator.DECREMENT
         ),
       ]);
 
       const instructions = new BytecodeGenerator(program).generate();
       expect(instructions).toMatchObject([
-        new ByteCode.LoadInt(1),
+        new ByteCode.LoadVar("myVar"),
+        new ByteCode.StoreReg(Register.id(0)),
+
+        new ByteCode.LoadReg(Register.id(0)),
+        new ByteCode.Decrement(),
+        new ByteCode.StoreReg(Register.id(0)),
+      ]);
+    });
+  });
+
+  describe("postfix increments", () => {
+    it("should increment a int value", () => {
+      const program = new AST.Program([
+        new AST.PostfixIncrement(
+          new AST.IdentifierValue("myVar"),
+          AST.PostfixIncrementType.INCREMENT
+        ),
+      ]);
+
+      const instructions = new BytecodeGenerator(program).generate();
+      expect(instructions).toMatchObject([
+        new ByteCode.LoadVar("myVar"),
+        new ByteCode.StoreReg(Register.id(0)),
+
+        new ByteCode.LoadReg(Register.id(0)),
+        new ByteCode.Increment(),
+        new ByteCode.StoreReg(Register.id(0)),
+      ]);
+    });
+    it("should decrement a int value", () => {
+      const program = new AST.Program([
+        new AST.PostfixIncrement(
+          new AST.IdentifierValue("myVar"),
+          AST.PostfixIncrementType.DECREMENT
+        ),
+      ]);
+
+      const instructions = new BytecodeGenerator(program).generate();
+      expect(instructions).toMatchObject([
+        new ByteCode.LoadVar("myVar"),
         new ByteCode.StoreReg(Register.id(0)),
 
         new ByteCode.LoadReg(Register.id(0)),
