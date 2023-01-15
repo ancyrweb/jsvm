@@ -738,9 +738,12 @@ describe("while", () => {
 
 describe("integration with scanner", () => {
   it("should parse a small expression", () => {
-    const tokens = new Scanner("1 * (2 + 3) / 4 - 5;").build();
+    const tokens = new Scanner(`
+    int x = -20;
+    while (x < 10) {
+      x++;
+    }
+    `).build();
     const program = new Parser(tokens).parse();
-
-    // console.log(program.toString());
   });
 });

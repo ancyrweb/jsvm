@@ -42,25 +42,29 @@ export namespace AST {
   export abstract class ASTNode {}
 
   export class Program {
-    private nodes: ASTNode[];
+    private _nodes: ASTNode[];
     constructor(nodes?: ASTNode[]) {
-      this.nodes = nodes || [];
+      this._nodes = nodes || [];
     }
 
     at<T extends ASTNode>(index: number): T {
-      if (index >= this.nodes.length) {
+      if (index >= this._nodes.length) {
         throw new Error("Out of bounds");
       }
 
-      return this.nodes[index] as T;
+      return this._nodes[index] as T;
     }
 
     nodesLength() {
-      return this.nodes.length;
+      return this._nodes.length;
     }
 
     toString() {
-      return this.nodes.map((n) => n.toString()).join("\n");
+      return this._nodes.map((n) => n.toString()).join("\n");
+    }
+
+    nodes() {
+      return this._nodes;
     }
   }
 
